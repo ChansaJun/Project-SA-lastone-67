@@ -323,11 +323,11 @@ async function GetReservesDetailsByReserveId(id: number) {
 
 }
 
-async function updatePaymentStatus(id: string, data: PaymentInterface) {
+async function UpdateReserveStatus(id: string, data: ReservesInterface) {
 
   return await axios
 
-    .put(`${apiUrl}/payment/${id}`,data, requestOptions)
+    .put(`${apiUrl}/reserve/${id}`,data, requestOptions)
 
     .then((res) => res)
 
@@ -382,7 +382,7 @@ export {
 
   GetPaymentByShopId,
 
-  updatePaymentStatus,
+  UpdateReserveStatus,
 
   GetReservesByReseveId,
 };

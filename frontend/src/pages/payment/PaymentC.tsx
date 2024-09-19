@@ -8,6 +8,7 @@ import { PaymentInterface } from "../../interfaces/IPayment";
 import { CreatePayment, GetReservesByReseveId } from "../../services/https/index";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { ReserveDetailsInterface } from '../../interfaces/IReserveDetails';
+import { UpdateReserveStatus } from "../../services/https/index";
 
 function PaymentC() {
     const navigate = useNavigate();
@@ -15,63 +16,70 @@ function PaymentC() {
     const [messageApi, contextHolder] = message.useMessage();
     const [slipFileName, setSlipFileName] = useState<string>("");
     const [form] = Form.useForm();
-     const [reserve, setReserve] = useState<ReserveDetailsInterface>();
+    const [reserve, setReserve] = useState<ReserveDetailsInterface>();
 
-     const query = new URLSearchParams(location.search);
-     const reserveId = query.get('reserveId');
+    const query = new URLSearchParams(location.search);
+    const reserveId = query.get('reserveId');
 
-     const getReserves = async (reserveId: string) => {
-         try {
-           const res = await GetReservesByReseveId(reserveId);
-           setReserve(res.data);
-         } catch (error) {
-           messageApi.error('Error fetching shop data');
-         }
-       };
-     
-       useEffect(() => {
-         if (reserveId) {
-           getReserves(reserveId);
-         }
-       }, [reserveId]);
-     const onFinish = async (values: PaymentInterface) => {
- 
-         
-         // ตรวจสอบและจัดการข้อมูลให้ตรงตามโครงสร้างที่ต้องการ
-         const valuesWithReserveId = {
-             Name: values.name,
-             Date: values.date,
-             TotalPrice: values.total_price,
-             Slip: values.slip,
-             ReserveID: reserve?.ID // ใช้ค่า reserveid ที่ดึงมาจาก URL
-         };
-     
-         try {
-             // เรียก API เพื่อสร้างการชำระเงิน โดยส่ง valuesWithReserveId ที่มี reserveId
-             const res = await CreatePayment(valuesWithReserveId);
-     
-             if (res.status === 201) {
-                 messageApi.open({
-                     type: "success",
-                     content: res.data.message,
-                 });
-                 setTimeout(() => {
-                     navigate("/PaymentC?reserveId=${reserveId}");
-                 }, 2000);
-             } else {
-                 messageApi.open({
-                     type: "error",
-                     content: res.data.error,
-                 });
-             }
-         } catch (error) {
-             messageApi.open({
-                 type: "error",
-                 content: "เกิดข้อผิดพลาดในการสร้างการชำระเงิน",
-             });
-         }
-     };
-    
+    const getReserves = async (reserveId: string) => {
+        try {
+            const res = await GetReservesByReseveId(reserveId);
+            setReserve(res.data);
+        } catch (error) {
+            messageApi.error('Error fetching shop data');
+        }
+    };
+
+    useEffect(() => {
+        if (reserveId) {
+            getReserves(reserveId);
+        }
+    }, [reserveId]);
+
+
+    const onFinish = async (values: PaymentInterface) => {
+        const valuesWithReserveId = {
+            Name: values.name,
+            Date: values.date,
+            TotalPrice: values.total_price,
+            Slip: values.slip,
+            ReserveID: reserve?.ID // Use the reserve ID from the state
+        };
+
+        try {
+            // Create payment first
+            const res = await CreatePayment(valuesWithReserveId);
+
+            if (res.status === 201) {
+                // Update reserve status after successful payment
+                if (reserve?.ID) {
+                    await UpdateReserveStatus(reserve.ID.toString(), "ชำระเงินแล้ว");
+                }
+
+                // Show success message
+                messageApi.open({
+                    type: "success",
+                    content: res.data.message,
+                });
+
+                // Navigate to reserve dashboard after 2 seconds
+                setTimeout(() => {
+                    navigate("/reserve_dashboard");
+                }, 2000);
+            } else {
+                messageApi.open({
+                    type: "error",
+                    content: res.data.error,
+                });
+            }
+        } catch (error) {
+            messageApi.open({
+                type: "error",
+                content: "เกิดข้อผิดพลาดในการสร้างการชำระเงิน",
+            });
+        }
+    };
+
 
     // Handle image upload
     const handleUpload = (file: any) => {

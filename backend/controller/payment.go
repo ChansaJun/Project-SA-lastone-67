@@ -75,6 +75,37 @@ func ListPayment(c *gin.Context) {
 	c.JSON(http.StatusOK, payments)
 }
 
+func UpdateReserveStatus(c *gin.Context) {
+	var reserve entity.Reserve
+
+	// ดึงค่า ReserveID จาก URL parameter
+	ReserveID := c.Param("id")
+
+	// เชื่อมต่อกับฐานข้อมูล
+	db := config.DB()
+
+	// ค้นหา Reserve ตาม ID
+	result := db.Where("id = ?", ReserveID).First(&reserve)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Reserve ID not found"})
+		return
+	}
+
+	// อัปเดตสถานะของการจอง
+	reserve.Status = "ชำระเงินแล้ว"
+
+	// บันทึกการเปลี่ยนแปลงไปยังฐานข้อมูล
+	result = db.Save(&reserve)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to update reserve status"})
+		return
+	}
+
+	// ส่ง response กลับเมื่ออัปเดตสำเร็จ
+	c.JSON(http.StatusOK, gin.H{"message": "Reserve status updated successfully"})
+}
+
+
 func GetReserveById(c *gin.Context) {
 	ID := c.Param("id")
 	var user entity.Reserve

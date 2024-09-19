@@ -87,6 +87,8 @@ func main() {
        router.GET("/reservesdetails/:id", controller.ListReservesDetails)
 
        router.GET("/reserve/:id", controller.GetReserveById)
+
+       router.PUT("reserve/:id",controller.UpdateReserveStatus)
    }
 
 
