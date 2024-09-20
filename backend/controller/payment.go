@@ -126,9 +126,3 @@ func GetReserveById(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func GetReserveDetails(c *gin.Context) {
-	var reservesDetails []entity.ReserveDetails
-	db := config.DB()
-	db.Find(&reservesDetails)
-	c.JSON(http.StatusOK, &reservesDetails)
-}
