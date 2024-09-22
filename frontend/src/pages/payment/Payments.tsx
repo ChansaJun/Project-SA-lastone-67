@@ -8,14 +8,11 @@ import visa from "../../assets/visa.png";
 import { Space, Button, Col, Row, Form, message } from "antd";
 import { GetReservesDetailsByReserveId } from "../../services/https/index";
 import { ReserveDetailsInterface } from "../../interfaces/IReserveDetails";
-import { ReservesInterface } from "../../interfaces/IReserve";
 
 const Payments: React.FC = () => {
     const [paymentMethod, setPaymentMethod] = useState<string>('promptpay');
-    const [savedPayment, setSavedPayment] = useState(false);
     const [reservesDetails, setReservesDetails] = useState<ReserveDetailsInterface[]>([]);
     const [totalPrice, setTotalPrice] = useState<number>(0);
-    const [messageApi, contextHolder] = message.useMessage();
     const location = useLocation();
     const navigate = useNavigate();
     const query = new URLSearchParams(location.search);
@@ -57,10 +54,10 @@ const Payments: React.FC = () => {
                     <Paper elevation={5} sx={{ p: 2 }}>
                         <Typography variant="h6">วิธีการชำระเงิน</Typography>
 
-                        <RadioGroup value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+                        <RadioGroup value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} >
                             <FormControlLabel
                                 value="promptpay"
-                                control={<Radio />}
+                                control={<Radio color="error" />}
                                 label={
                                     <Box display="flex" justifyContent="flex-end" alignItems="center">
                                         พร้อมเพย์
@@ -82,7 +79,7 @@ const Payments: React.FC = () => {
 
                             <FormControlLabel
                                 value="creditcard"
-                                control={<Radio />}
+                                control={<Radio color="error"/>}
                                 label={
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Typography>บัตรเครดิต/บัตรเดบิต</Typography>
@@ -115,14 +112,6 @@ const Payments: React.FC = () => {
                                             <input type="text" placeholder="123" style={{ padding: '8px', margin: '8px 0' }} />
                                         </Box>
                                     </Box>
-                                    <Box sx={{ mt: 2 }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={savedPayment}
-                                            onChange={() => setSavedPayment(!savedPayment)}
-                                        />
-                                        <label> บันทึกข้อมูลบัตรเครดิตเพื่อใช้ในรอบถัดไป</label>
-                                    </Box>
                                 </Box>
                             </Box>
                         )}
@@ -146,7 +135,12 @@ const Payments: React.FC = () => {
                                         ยกเลิก
                                     </Button>
                                 </Link>
-                                <Button type="primary" icon={<PlusOutlined />} onClick={handleConfirm}>
+                                <Button type="primary" icon={<PlusOutlined />} onClick={handleConfirm}
+                                  style={{
+                                    backgroundColor: 'red',
+                                    borderColor: 'red',
+                                    color: 'white',
+                                  }}>
                                     ยืนยัน
                                 </Button>
                             </Space>
@@ -188,7 +182,7 @@ const styles = {
         fontSize: '16px',
         cursor: 'pointer',
         backgroundColor: 'red',
-        color: 'white',
+        color: 'red',
         border: '5px',
         borderRadius: '10px',
     },

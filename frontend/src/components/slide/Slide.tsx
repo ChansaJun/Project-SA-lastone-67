@@ -20,7 +20,7 @@ function Slide() {
         <Carousel.Item interval={500}>
           <img
             id="pic"
-            src="https://tatapi.tourismthailand.org/tatfs/Image/CustomPOI/Picture/P03018129_1.jpeg"
+            src="https://edtprod1.edtguide.com/edtguide/assets/SAVEONE-GO-2.jpg"
             alt="Second slide"
           />
           <Carousel.Caption>
@@ -31,7 +31,7 @@ function Slide() {
         <Carousel.Item>
           <img
             id="pic"
-            src="https://tatapi.tourismthailand.org/tatfs/Image/CustomPOI/Picture/P03018129_1.jpeg"
+            src="https://edtprod1.edtguide.com/edtguide/assets/DSC09277_2023-11-02-105603_jocu.jpg"
             alt="Third slide"
           />
           <Carousel.Caption>
