@@ -7,7 +7,6 @@ import { SignInInterface } from "../../interfaces/SignIn";
 
 import { PaymentInterface } from "../../interfaces/IPayment";
 
-
 import axios from "axios";
 
 const apiUrl = "http://localhost:8000";
@@ -336,6 +335,9 @@ async function UpdateReserveStatus(id: string, data: ReservesInterface) {
 }
 
 
+
+
+
 export {
 
   SignIn,
@@ -385,4 +387,5 @@ export {
   UpdateReserveStatus,
 
   GetReservesByReseveId,
+
 };

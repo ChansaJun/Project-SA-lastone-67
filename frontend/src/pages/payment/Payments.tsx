@@ -5,18 +5,29 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import qr from "../../assets/qr.png";
 import visa from "../../assets/visa.png";
-import { Space, Button, Col, Row, Form, message } from "antd";
-import { GetReservesDetailsByReserveId } from "../../services/https/index";
+import { Space, Button, Col, Row, Form, Modal, Input, message } from "antd";
+import { GetReservesDetailsByReserveId, CreatePayment } from "../../services/https/index";
 import { ReserveDetailsInterface } from "../../interfaces/IReserveDetails";
+import { UsersInterface } from '../../interfaces/IUser';
+import { PaymentInterface } from '../../interfaces/IPayment';
+import { UpdateReserveStatus, GetReservesByReseveId } from "../../services/https/index";
 
 const Payments: React.FC = () => {
     const [paymentMethod, setPaymentMethod] = useState<string>('promptpay');
     const [reservesDetails, setReservesDetails] = useState<ReserveDetailsInterface[]>([]);
     const [totalPrice, setTotalPrice] = useState<number>(0);
+    const [creditCards, setCreditCards] = useState<string[]>([]);
+    const [user, setUser] = useState<UsersInterface>();
+    const [reserve, setReserve] = useState<ReserveDetailsInterface>();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false); // state สำหรับ modal ยืนยันการชำระเงิน
+    // const [newCard, setNewCard] = useState({ CardName: '', CardNumber: '', Exp: '', CVV: '' }); // เปลี่ยนชื่อฟิลด์
     const location = useLocation();
     const navigate = useNavigate();
+    const [messageApi, contextHolder] = message.useMessage();
     const query = new URLSearchParams(location.search);
     const reserveId = query.get('reserveId');
+
 
     useEffect(() => {
         const fetchReservesDetails = async (reserveId: number) => {
@@ -39,13 +50,143 @@ const Payments: React.FC = () => {
         };
 
         if (reserveId) {
-            fetchReservesDetails(parseInt(reserveId, 10)); // Convert reserveId to number
+            fetchReservesDetails(parseInt(reserveId, 10));
         }
     }, [reserveId]);
 
-    const handleConfirm = () => {
-            navigate(`/PaymentC/?reserveId=${reserveId}`);
+const getReserves = async (reserveId: string) => {
+    try {
+        const res = await GetReservesByReseveId(reserveId);
+        setReserve(res.data);
+    } catch (error) {
+        messageApi.error('Error fetching shop data');
+    }  
+};
+
+useEffect(() => {
+    if (reserveId) {
+        getReserves(reserveId);
+    }
+}, [reserveId]);
+
+// const handleConfirm1 = async () => {
+//     if (!reserve) {
+//         messageApi.error("Reserve data is not available.");
+//         return;
+//     }
+
+//     const valuesWithReserveId = {
+//         Date: reserve.Date, // Assuming the 'date' is a field in your reserve data
+//         TotalPrice: totalPrice, // Use totalPrice from the state
+//         ReserveID: reserve.ID, // Use the reserve ID from the state
+        
+//     };
+
+//     console.log(valuesWithReserveId);
+//     try {
+//         // Create payment first
+//         const res = await CreatePayment(valuesWithReserveId);
+
+//         if (res.status === 201) {
+//             // Update reserve status after successful payment
+//             if (reserve?.ID) {
+//                 await UpdateReserveStatus(reserve.ID.toString(), "ชำระเงินแล้ว");
+//             }
+
+//             // Show success message
+//             messageApi.open({
+//                 type: "success",
+//                 content: res.data.message,
+//             });
+
+//             // Navigate to reserve dashboard after 2 seconds
+//             setTimeout(() => {
+//                 navigate("/reserve_dashboard");
+//             }, 2000);
+//         } else {
+//             messageApi.open({
+//                 type: "error",
+//                 content: res.data.error,
+//             });
+//         }
+//     } catch (error) {
+//         messageApi.open({
+//             type: "error",
+//             content: "เกิดข้อผิดพลาดในการสร้างการชำระเงิน",
+//         });
+//     }
+// };
+
+
+const handleConfirm2 = async () => {
+    if (!reserve) {
+        messageApi.error("Reserve data is not available.");
+        return;
+    }
+
+    const valuesWithReserveId = {
+        Date: reserve.Date, // Assuming the 'date' is a field in your reserve data
+        TotalPrice: reserve.TotalPrice, // Assuming 'total_price' is also a field in your reserve data
+        ReserveID: reserve.ID // Use the reserve ID from the state
     };
+
+    console.log(valuesWithReserveId);
+    try {
+        // Create payment first
+        const res = await CreatePayment(valuesWithReserveId);
+
+        if (res.status === 201) {
+            // Update reserve status after successful payment
+            if (reserve?.ID) {
+                await UpdateReserveStatus(reserve.ID.toString(), "ชำระเงินแล้ว");
+            }
+
+            // Show success message
+            messageApi.open({
+                type: "success",
+                content: res.data.message,
+            });
+
+            // Navigate to reserve dashboard after 2 seconds
+            setTimeout(() => {
+                navigate("/reserve_dashboard");
+            }, 2000);
+        } else {
+            messageApi.open({
+                type: "error",
+                content: res.data.error,
+            });
+        }
+    } catch (error) {
+        messageApi.open({
+            type: "error",
+            content: "เกิดข้อผิดพลาดในการสร้างการชำระเงิน",
+        });
+    }
+};
+
+
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+
+    // ฟังก์ชันเปิด modal สำหรับการยืนยันการชำระเงิน
+    const showConfirmModal = () => {
+        setIsConfirmModalVisible(true);
+    };
+
+    // ฟังก์ชันปิด modal เมื่อยกเลิก
+    const handleCancelConfirm = () => {
+        setIsConfirmModalVisible(false);
+    };
+
+
+
+
 
     return (
         <div style={styles.pageContainer}>
@@ -74,12 +215,49 @@ const Payments: React.FC = () => {
                                         <QRCode value={`https://example.com/pay?&amount=${totalPrice}`} size={128} level="H" />
                                         <p>ราคาทั้งหมด: {totalPrice.toFixed(2)} บาท</p>
                                     </div>
+                                    <Row justify="end">
+                                        <Col style={{ marginTop: "40px" }}>
+                                            <Form.Item>
+                                                <Space>
+                                                    <Link to="/">
+                                                        <Button htmlType="button" style={{ marginRight: "10px" }}>
+                                                            ยกเลิก
+                                                        </Button>
+                                                    </Link>
+                                                    <Button
+                                                        type="primary"
+                                                        icon={<PlusOutlined />}
+                                                        onClick={showConfirmModal} // เมื่อคลิกจะเปิด modal
+                                                        style={{
+                                                            backgroundColor: 'red',
+                                                            borderColor: 'red',
+                                                            color: 'white',
+                                                        }}
+                                                    >
+                                                        ยืนยัน
+                                                    </Button>
+
+                                                    {/* Modal สำหรับยืนยันการชำระเงิน */}
+                                                    <Modal
+                                                        title="ยืนยันการชำระเงิน"
+                                                        visible={isConfirmModalVisible} // ควบคุมการแสดง modal ด้วย state
+                                                        onOk={handleConfirm2} // เมื่อกดยืนยันใน modal จะเรียกฟังก์ชัน handleConfirm2
+                                                        onCancel={handleCancelConfirm} // เมื่อกดยกเลิกใน modal
+                                                        okText="ยืนยัน"
+                                                        cancelText="ยกเลิก"
+                                                    >
+                                                        <p>คุณแน่ใจหรือไม่ว่าต้องการยืนยันการชำระเงินแล้ว?</p>
+                                                    </Modal>
+                                                </Space>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
                                 </Box>
                             )}
 
                             <FormControlLabel
                                 value="creditcard"
-                                control={<Radio color="error"/>}
+                                control={<Radio color="error" />}
                                 label={
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Typography>บัตรเครดิต/บัตรเดบิต</Typography>
@@ -94,30 +272,17 @@ const Payments: React.FC = () => {
                         </RadioGroup>
 
                         {paymentMethod === 'creditcard' && (
-                            <Box sx={{ mt: 2 }}>
-                                <Typography variant="h6" textAlign="center">ข้อมูลบัตรเครดิต</Typography>
-                                <Box sx={{ mt: 2, mb: 2 }}>
-                                    <label>ชื่อเจ้าของบัตรเครดิต</label><br />
-                                    <input type="text" placeholder="Cardholder name" style={{ width: '95%', padding: '8px', margin: '8px 0' }} />
-
-                                    <label>หมายเลขบัตร</label><br />
-                                    <input type="text" placeholder="1234 5678 9012 3456" style={{ width: '95%', padding: '8px', margin: '8px 0' }} />
-                                    <Box sx={{ display: 'flex', justifyContent: 'space', gap: '16px' }}>
-                                        <Box>
-                                            <label>วันหมดอายุ</label><br />
-                                            <input type="text" placeholder="MM/YY" style={{ padding: '8px', margin: '8px 0' }} />
-                                        </Box>
-                                        <Box >
-                                            <label>CVV</label><br />
-                                            <input type="text" placeholder="123" style={{ padding: '8px', margin: '8px 0' }} />
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </Box>
+                            
+                                    <Button type="primary" danger onClick={showModal}>
+                                        เพิ่มบัตร
+                                    </Button>
+                                
+                            
                         )}
                     </Paper>
                 </Box>
             </div>
+
 
             <div style={styles.summaryContainer}>
                 <h2>รายการทั้งหมด</h2>
@@ -126,28 +291,42 @@ const Payments: React.FC = () => {
                         {detail.lock_id} &nbsp;: &nbsp; &nbsp; &nbsp; {detail.price.toFixed(2)}
                     </p>))}
                 <h2>ราคาทั้งหมด&nbsp;: &nbsp; &nbsp; &nbsp;{totalPrice.toFixed(2)} บาท</h2>
-                <Row justify="end">
-                    <Col style={{ marginTop: "40px" }}>
-                        <Form.Item>
-                            <Space>
-                                <Link to="/">
-                                    <Button htmlType="button" style={{ marginRight: "10px" }}>
-                                        ยกเลิก
-                                    </Button>
-                                </Link>
-                                <Button type="primary" icon={<PlusOutlined />} onClick={handleConfirm}
-                                  style={{
-                                    backgroundColor: 'red',
-                                    borderColor: 'red',
-                                    color: 'white',
-                                  }}>
-                                    ยืนยัน
-                                </Button>
-                            </Space>
-                        </Form.Item>
-                    </Col>
-                </Row>
+
             </div>
+
+            <Modal title="เพิ่มบัตรเครดิต" visible={isModalVisible} onCancel={handleCancel} onOk={handleConfirm2} >
+                <Form layout="vertical">
+                    <Form.Item
+                        label="ชื่อบัตรเครดิต"
+                        name="name"
+                        rules={[{ required: true, message: "กรุณากรอกชื่อบัตรเครดิต !" }]}
+                    >
+                        <Input />
+                    </Form.Item>
+
+                    <Form.Item label="หมายเลขบัตร">
+                        <Input
+                            placeholder="1234 5678 9012 3456"
+                        />
+                    </Form.Item>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item label="วันหมดอายุ">
+                                <Input
+                                    placeholder="MM/YY"
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="CVV">
+                                <Input
+                                    placeholder="123"
+                                />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal>
         </div>
     );
 };
@@ -171,19 +350,5 @@ const styles = {
         padding: '20px',
         background: '#ffffff',
         borderRadius: '8px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        marginTop: '50px',
-        fontSize: '20px',
-        textAlign: 'left' as 'left',
-    },
-    button: {
-        marginTop: '20px',
-        padding: '10px 20px',
-        fontSize: '16px',
-        cursor: 'pointer',
-        backgroundColor: 'red',
-        color: 'red',
-        border: '5px',
-        borderRadius: '10px',
     },
 };

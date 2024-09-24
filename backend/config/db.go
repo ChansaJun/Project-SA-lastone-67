@@ -238,8 +238,6 @@ reserve := []entity.Reserve{
 	
 	for _, payment := range payments {
 		db.FirstOrCreate(&payment, entity.Payment{
-			Name:	   payment.Name,
-			Slip: payment.Slip,
 			ReserveID: payment.ReserveID,
 			Date:  payment.Date,
 		})

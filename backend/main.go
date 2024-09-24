@@ -54,6 +54,8 @@ func main() {
 
    r.POST("/payments", controller.CreatePayment)
 
+//    r.POST("/creditcard", controller.CreateCreditCard)
+
 
    router := r.Group("/")
 
@@ -88,7 +90,8 @@ func main() {
 
        router.GET("/reserve/:id", controller.GetReserveById)
 
-       router.PUT("reserve/:id",controller.UpdateReserveStatus)
+       router.PUT("/reserve/:id",controller.UpdateReserveStatus)
+
    }
 
 

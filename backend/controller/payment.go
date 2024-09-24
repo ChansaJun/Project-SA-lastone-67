@@ -26,10 +26,8 @@ func CreatePayment(c *gin.Context) {
 
 	// Create new payment entry
 	p := entity.Payment{
-		Name:       payments.Name,
 		Date:       payments.Date,
 		TotalPrice: payments.TotalPrice,
-		Slip:       payments.Slip,
 		ReserveID:  payments.ReserveID, // Ensure ReserveID is correctly bound
 	}
 
@@ -108,21 +106,39 @@ func UpdateReserveStatus(c *gin.Context) {
 
 func GetReserveById(c *gin.Context) {
 	ID := c.Param("id")
-	var user entity.Reserve
+	var reserve entity.Reserve
 
 	db := config.DB()
 
 	// Query the user by ID
-	results := db.Where("id = ?", ID).First(&user)
+	results := db.Where("id = ?", ID).First(&reserve)
 	if results.Error != nil {
 		if errors.Is(results.Error, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "Reserve not found"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": results.Error.Error()})
 		}
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, reserve)
 }
 
+func DeleteCreditCard(c *gin.Context) {
+
+
+	id := c.Param("id")
+ 
+	db := config.DB()
+ 
+	if tx := db.Exec("DELETE FROM users WHERE id = ?", id); tx.RowsAffected == 0 {
+ 
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id not found"})
+ 
+		return
+ 
+	}
+ 
+	c.JSON(http.StatusOK, gin.H{"message": "Deleted successful"})
+ 
+ }
