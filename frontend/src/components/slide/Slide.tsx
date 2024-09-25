@@ -13,8 +13,8 @@ function Slide() {
             alt="First slide"
           />
           <Carousel.Caption>
-            <h3>หน้าที่หนึ่ง</h3>
-            <p>อิอิ</p>
+            <h3>โซนของใช้</h3>
+            <p>มีของใช้หลากหลายเหมาะกับทุกเทศกาล</p>
           </Carousel.Caption>
         </Carousel.Item>
         <Carousel.Item interval={500}>
@@ -24,8 +24,8 @@ function Slide() {
             alt="Second slide"
           />
           <Carousel.Caption>
-            <h3>หน้าทีสอง</h3>
-            <p>อิอิ.</p>
+            <h3>โซนอาหาร</h3>
+            <p>มีของกินมากมายให้เลือกช็อป</p>
           </Carousel.Caption>
         </Carousel.Item>
         <Carousel.Item>
@@ -35,8 +35,8 @@ function Slide() {
             alt="Third slide"
           />
           <Carousel.Caption>
-            <h3>หน้าที่สาม</h3>
-            <p>อิอิ.</p>
+            <h3>โซนที่นั่ง</h3>
+            <p>มีทีา่นั่งรองรับมากมาย</p>
           </Carousel.Caption>
         </Carousel.Item>
       </Carousel>

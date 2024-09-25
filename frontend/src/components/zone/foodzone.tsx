@@ -23,14 +23,7 @@ const foodzone: React.FC = () => {
               สำหรับลูกค้าที่ต้องการความหลากหลาย หมุนเวียนทุกวัน อยากเดินเล่น หาดูของกินไปด้วยเพลินๆ ชิลๆ แล้วล่ะก็โซนนี้จะตอบโจทย์มาก
               เพราะมีอาหารหลากหลายประเภท จุดเด่นของโซนนี้คือ <strong>มีร้านค้าหมุนเวียนทุกวัน</strong>
             </Paragraph>
-            <Row gutter={16}>
-              <Col>
-                <Button type="primary" className="red-button" >ดูเพิ่มเติม</Button>
-              </Col>
-              <Col>
-                <Button>ขอเส้นทาง</Button>
-              </Col>
-            </Row>
+            
           </div>
         </Col>
       </Row>
@@ -50,14 +43,7 @@ const foodzone: React.FC = () => {
             <Paragraph>
               สายชิลต้องไม่พลาดโซนนี้ เพราะบรรยากาศยามเย็นที่เต็มไปด้วยร้านอาหารริมถนน อาหารอร่อยราคาเบาๆ พร้อมเครื่องดื่มเย็นๆ
             </Paragraph>
-            <Row gutter={16}>
-              <Col>
-                <Button type="primary" className="red-button" >ดูเพิ่มเติม</Button>
-              </Col>
-              <Col>
-                <Button>ขอเส้นทาง</Button>
-              </Col>
-            </Row>
+            
           </div>
         </Col>
       </Row>
@@ -77,14 +63,7 @@ const foodzone: React.FC = () => {
             <Paragraph>
               สำหรับผู้ที่ชื่นชอบบรรยากาศตลาดกลางคืน เดินเพลินๆ ซื้อของไปกินไป แนะนำให้มาเที่ยวโซนนี้ จะพบกับร้านค้าหลากหลายและของกินอร่อยๆ
             </Paragraph>
-            <Row gutter={16}>
-              <Col>
-                <Button type="primary" className="red-button" >ดูเพิ่มเติม</Button>
-              </Col>
-              <Col>
-                <Button>ขอเส้นทาง</Button>
-              </Col>
-            </Row>
+            
           </div>
         </Col>
       </Row>

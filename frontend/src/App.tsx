@@ -11,7 +11,6 @@ import UserEdit from './pages/users/edit';
 import ReserveDashboard from './pages/reserve/reserveDashboard';
 
 import PaymentDashboard from './pages/payment/PaymentDashboard';
-import PaymentC from './pages/payment/PaymentC';
 import Payments from './pages/payment/Payments';
 
 function App() {
@@ -39,7 +38,7 @@ function App() {
           <Route path="/edit-profile" element={<UserEdit />} />
           <Route path="/reserve_dashboard" element={<ReserveDashboard />} />
           <Route path="/Payments" element={<Payments />} />
-          <Route path="/PaymentC" element={<PaymentC />} />
+          
           <Route path="/payment_dashboard" element={<PaymentDashboard />} />
         </Routes>
       )}
